@@ -55,13 +55,16 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
         initData();
     }
 
+    public static void startChannelActivity(AppCompatActivity context,String jsonArray){
+        Intent intent=new Intent(context, ChannelActivity.class);
+        intent.putExtra(RESULT_JSON_KEY,jsonArray);
+        context.startActivityForResult(intent,REQUEST_CODE);
+    }
+
     public static void startChannelActivity(AppCompatActivity context,List<ChannelBean> list){
         Gson gson =new Gson();
-        String jsonStr=gson.toJson(list);
-
-        Intent intent=new Intent(context, ChannelActivity.class);
-        intent.putExtra(RESULT_JSON_KEY,jsonStr);
-        context.startActivityForResult(intent,REQUEST_CODE);
+        String jsonArray=gson.toJson(list);
+        startChannelActivity(context,jsonArray);
     }
 
     /**
