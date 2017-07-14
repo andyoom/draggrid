@@ -86,11 +86,11 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
     private void saveChannel() {
         List<ChannelBean> listAll=new ArrayList<>();
         for(ChannelItem item :userChannelList){
-            ChannelBean bean = new ChannelBean(item.getName(),item.getSelected()==1);
+            ChannelBean bean = new ChannelBean(item.getName(),true);
             listAll.add(bean);
         }
         for(ChannelItem item :otherChannelList){
-            ChannelBean bean = new ChannelBean(item.getName(),item.getSelected()==1);
+            ChannelBean bean = new ChannelBean(item.getName(),false);
             listAll.add(bean);
         }
 
