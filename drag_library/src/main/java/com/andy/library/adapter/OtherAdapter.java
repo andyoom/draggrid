@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.andy.library.ChannelItem;
 import com.andy.library.R;
+import com.andy.library.bean.ChannelItem;
 
 import java.util.List;
 

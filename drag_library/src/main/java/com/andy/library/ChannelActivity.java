@@ -1,6 +1,7 @@
 package com.andy.library;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 
 import com.andy.library.adapter.DragAdapter;
 import com.andy.library.adapter.OtherAdapter;
+import com.andy.library.bean.ChannelItem;
+import com.andy.library.bean.ChannelManage;
 import com.andy.library.view.DragGrid;
 import com.andy.library.view.OtherGridView;
 import com.google.gson.Gson;
@@ -27,7 +30,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChannelActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class ChannelActivity  extends Activity implements AdapterView.OnItemClickListener {
     /** 用户栏目的GRIDVIEW */
     private DragGrid userGridView;
     /** 其它栏目的GRIDVIEW */
@@ -42,7 +45,6 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
     ArrayList<ChannelItem> userChannelList = new ArrayList<ChannelItem>();
     /** 是否在移动，由于这边是动画结束后才进行的数据更替，设置这个限制为了避免操作太频繁造成的数据错乱。 */
     boolean isMove = false;
-
     public static int REQUEST_CODE =100;
     public static int RESULT_CODE =101;
     public static String RESULT_JSON_KEY = "json";
@@ -50,21 +52,9 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.subscribe_activity);
-        initView();
         getListData();
+        initView();
         initData();
-    }
-
-    public static void startChannelActivity(AppCompatActivity context,String jsonArray){
-        Intent intent=new Intent(context, ChannelActivity.class);
-        intent.putExtra(RESULT_JSON_KEY,jsonArray);
-        context.startActivityForResult(intent,REQUEST_CODE);
-    }
-
-    public static void startChannelActivity(AppCompatActivity context,List<ChannelBean> list){
-        Gson gson =new Gson();
-        String jsonArray=gson.toJson(list);
-        startChannelActivity(context,jsonArray);
     }
 
     /**
@@ -73,40 +63,31 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
     private void getListData(){
         String jsonStr = getIntent().getStringExtra(RESULT_JSON_KEY);
         List<ChannelBean> listAll = new Gson().fromJson(jsonStr,new TypeToken<List<ChannelBean>>(){}.getType());
-
-        for (int i=0;i<listAll.size();i++){
-            ChannelBean bean = listAll.get(i);
-            ChannelItem item=new ChannelItem((i+1),bean.getName(),(i+1),bean.isSelect()?1:0);
-            if (bean.isSelect()){
-                userChannelList.add(item);
-            }else{
-                otherChannelList.add(item);
-            }
-        }
+        ChannelManage.initData(listAll);
     }
 
-    /** 退出时候保存选择后数据库的设置  */
-    private void saveChannel() {
-        List<ChannelBean> listAll=new ArrayList<>();
-        for(ChannelItem item :userChannelList){
-            ChannelBean bean = new ChannelBean(item.getName(),true);
-            listAll.add(bean);
-        }
-        for(ChannelItem item :otherChannelList){
-            ChannelBean bean = new ChannelBean(item.getName(),false);
-            listAll.add(bean);
-        }
-
-        String jsonStr = new Gson().toJson(listAll);
-
-        Intent intent=new Intent();
-        intent.putExtra(RESULT_JSON_KEY,jsonStr);
-        setResult(RESULT_CODE,intent);
+    public static void startChannel(AppCompatActivity context){
+        Intent intent=new Intent(context, ChannelActivity.class);
+        context.startActivity(intent);
     }
 
+
+    public static void startChannelForResult(AppCompatActivity context, String jsonArray){
+        Intent intent=new Intent(context, ChannelActivity.class);
+        intent.putExtra(RESULT_JSON_KEY,jsonArray);
+        context.startActivityForResult(intent,REQUEST_CODE);
+    }
+
+    public static void startChannelForResult(AppCompatActivity context,List<ChannelBean> list){
+        Gson gson =new Gson();
+        String jsonArray=gson.toJson(list);
+        startChannelForResult(context,jsonArray);
+    }
 
     /** 初始化数据*/
     private void initData() {
+        userChannelList = ((ArrayList<ChannelItem>)ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).getUserChannel());
+        otherChannelList = ((ArrayList<ChannelItem>)ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).getOtherChannel());
         userAdapter = new DragAdapter(this, userChannelList);
         userGridView.setAdapter(userAdapter);
         otherAdapter = new OtherAdapter(this, otherChannelList);
@@ -122,16 +103,16 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
         otherGridView = (OtherGridView) findViewById(R.id.otherGridView);
     }
 
-    /** GRIDVIEW对应的ITEM点击监听接口  */
 
+    /** GRIDVIEW对应的ITEM点击监听接口  */
     @Override
-    public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+    public void onItemClick(AdapterView<?> parent, final View view, final int position,long id) {
         //如果点击的时候，之前动画还没结束，那么就让点击事件无效
         if(isMove){
             return;
         }
-        if(parent.getId()==R.id.userGridView){
-            //position为 0，1 的不可以进行任何操作
+        int i = parent.getId();
+        if (i == R.id.userGridView) {//position为 0，1 的不可以进行任何操作
             if (position != 0 && position != 1) {
                 final ImageView moveImageView = getView(view);
                 if (moveImageView != null) {
@@ -148,7 +129,7 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
                                 int[] endLocation = new int[2];
                                 //获取终点的坐标
                                 otherGridView.getChildAt(otherGridView.getLastVisiblePosition()).getLocationInWindow(endLocation);
-                                MoveAnim(moveImageView, startLocation , endLocation, channel,userGridView);
+                                MoveAnim(moveImageView, startLocation, endLocation, channel, userGridView);
                                 userAdapter.setRemove(position);
                             } catch (Exception localException) {
                             }
@@ -156,9 +137,10 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
                     }, 50L);
                 }
             }
-        }else if(parent.getId()==R.id.otherGridView){
+
+        } else if (i == R.id.otherGridView) {
             final ImageView moveImageView = getView(view);
-            if (moveImageView != null){
+            if (moveImageView != null) {
                 TextView newTextView = (TextView) view.findViewById(R.id.text_item);
                 final int[] startLocation = new int[2];
                 newTextView.getLocationInWindow(startLocation);
@@ -172,13 +154,14 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
                             int[] endLocation = new int[2];
                             //获取终点的坐标
                             userGridView.getChildAt(userGridView.getLastVisiblePosition()).getLocationInWindow(endLocation);
-                            MoveAnim(moveImageView, startLocation , endLocation, channel,otherGridView);
+                            MoveAnim(moveImageView, startLocation, endLocation, channel, otherGridView);
                             otherAdapter.setRemove(position);
                         } catch (Exception localException) {
                         }
                     }
                 }, 50L);
             }
+
         }
     }
     /**
@@ -247,8 +230,7 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
         int x = initLocation[0];
         int y = initLocation[1];
         viewGroup.addView(view);
-        LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams mLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         mLayoutParams.leftMargin = x;
         mLayoutParams.topMargin = y;
         view.setLayoutParams(mLayoutParams);
@@ -279,6 +261,32 @@ public class ChannelActivity extends AppCompatActivity implements AdapterView.On
         ImageView iv = new ImageView(this);
         iv.setImageBitmap(cache);
         return iv;
+    }
+
+    /** 退出时候保存选择后数据库的设置  */
+    private void saveChannel() {
+        ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).deleteAllChannel();
+        ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).saveUserChannel(userAdapter.getChannnelLst());
+        ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).saveOtherChannel(otherAdapter.getChannnelLst());
+        setResult();
+    }
+
+    /** 退出时候保存选择后数据库的设置  */
+    private void setResult() {
+        List<ChannelBean> listAll=new ArrayList<>();
+        for(ChannelItem item :userChannelList){
+            ChannelBean bean = new ChannelBean(item.getName(),true);
+            listAll.add(bean);
+        }
+        for(ChannelItem item :otherChannelList){
+            ChannelBean bean = new ChannelBean(item.getName(),false);
+            listAll.add(bean);
+        }
+
+        String jsonStr = new Gson().toJson(listAll);
+        Intent intent=new Intent();
+        intent.putExtra(RESULT_JSON_KEY,jsonStr);
+        setResult(RESULT_CODE,intent);
     }
 
     @Override

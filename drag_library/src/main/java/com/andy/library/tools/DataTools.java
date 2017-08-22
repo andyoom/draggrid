@@ -1,10 +1,10 @@
-package com.andy.library;
+package com.andy.library.tools;
 
 import android.content.Context;
 
 public class DataTools {
 	/**
-	 * dipתΪ px
+	 * dip 2 px
 	 */
 	public static int dip2px(Context context, float dipValue) {
 		final float scale = context.getResources().getDisplayMetrics().density;
@@ -12,7 +12,7 @@ public class DataTools {
 	}
 
 	/**
-	 *  px תΪ dip
+	 *  px 2 dip
 	 */
 	public static int px2dip(Context context, float pxValue) {
 		final float scale = context.getResources().getDisplayMetrics().density;

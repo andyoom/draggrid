@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             list.add(bean1);
         }
 
-        ChannelActivity.startChannelActivity(this,list);
+        ChannelActivity.startChannelForResult(this,list);
     }
 
     @Override

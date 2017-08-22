@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DragGridDemo.iml" filepath="$PROJECT_DIR$/DragGridDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/drag_library/drag_library.iml" filepath="$PROJECT_DIR$/drag_library/drag_library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/draggrid.iml" filepath="$PROJECT_DIR$/draggrid.iml" />
     </modules>
   </component>
 </project>
