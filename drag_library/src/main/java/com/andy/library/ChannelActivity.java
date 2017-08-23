@@ -75,34 +75,34 @@ public class ChannelActivity  extends AppCompatActivity implements AdapterView.O
         ChannelManage.initData(listAll);
     }
 
-    public static void startChannel(AppCompatActivity context){
+    public static void startChannel(Activity context){
         startChannel(context,ChannelActivity.class);
     }
 
-    public static void startChannel(AppCompatActivity context,Class<? extends Activity> cls){
+    public static void startChannel(Activity context,Class<? extends Activity> cls){
         Intent intent=new Intent(context, cls);
         context.startActivity(intent);
     }
 
 
-    public static void startChannelForResult(AppCompatActivity context, String jsonArray){
+    public static void startChannelForResult(Activity context, String jsonArray){
         startChannelForResult(context, jsonArray ,ChannelActivity.class);
     }
 
 
-    public static void startChannelForResult(AppCompatActivity context,List<ChannelBean> list){
+    public static void startChannelForResult(Activity context,List<ChannelBean> list){
         Gson gson =new Gson();
         String jsonArray=gson.toJson(list);
         startChannelForResult(context,jsonArray);
     }
 
-    public static void startChannelForResult(AppCompatActivity context,List<ChannelBean> list,Class<? extends Activity> cls){
+    public static void startChannelForResult(Activity context,List<ChannelBean> list,Class<? extends Activity> cls){
         Gson gson =new Gson();
         String jsonArray=gson.toJson(list);
         startChannelForResult(context,jsonArray,cls);
     }
 
-    public static void startChannelForResult(AppCompatActivity context, String jsonArray,Class<? extends Activity> cls){
+    public static void startChannelForResult(Activity context, String jsonArray,Class<? extends Activity> cls){
         Intent intent=new Intent(context, cls);
         intent.putExtra(RESULT_JSON_KEY,jsonArray);
         context.startActivityForResult(intent,REQUEST_CODE);
