@@ -30,7 +30,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChannelActivity  extends Activity implements AdapterView.OnItemClickListener {
+public class ChannelActivity  extends AppCompatActivity implements AdapterView.OnItemClickListener {
     /** 用户栏目的GRIDVIEW */
     private DragGrid userGridView;
     /** 其它栏目的GRIDVIEW */
@@ -51,10 +51,19 @@ public class ChannelActivity  extends Activity implements AdapterView.OnItemClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.subscribe_activity);
+        setContentView(layoutId());
         getListData();
         initView();
+        otherSetting();
         initData();
+    }
+
+    public void otherSetting() {
+
+    }
+
+    public int layoutId(){
+        return R.layout.subscribe_activity;
     }
 
     /**
@@ -67,16 +76,19 @@ public class ChannelActivity  extends Activity implements AdapterView.OnItemClic
     }
 
     public static void startChannel(AppCompatActivity context){
-        Intent intent=new Intent(context, ChannelActivity.class);
+        startChannel(context,ChannelActivity.class);
+    }
+
+    public static void startChannel(AppCompatActivity context,Class<? extends Activity> cls){
+        Intent intent=new Intent(context, cls);
         context.startActivity(intent);
     }
 
 
     public static void startChannelForResult(AppCompatActivity context, String jsonArray){
-        Intent intent=new Intent(context, ChannelActivity.class);
-        intent.putExtra(RESULT_JSON_KEY,jsonArray);
-        context.startActivityForResult(intent,REQUEST_CODE);
+        startChannelForResult(context, jsonArray ,ChannelActivity.class);
     }
+
 
     public static void startChannelForResult(AppCompatActivity context,List<ChannelBean> list){
         Gson gson =new Gson();
@@ -84,6 +96,17 @@ public class ChannelActivity  extends Activity implements AdapterView.OnItemClic
         startChannelForResult(context,jsonArray);
     }
 
+    public static void startChannelForResult(AppCompatActivity context,List<ChannelBean> list,Class<? extends Activity> cls){
+        Gson gson =new Gson();
+        String jsonArray=gson.toJson(list);
+        startChannelForResult(context,jsonArray,cls);
+    }
+
+    public static void startChannelForResult(AppCompatActivity context, String jsonArray,Class<? extends Activity> cls){
+        Intent intent=new Intent(context, cls);
+        intent.putExtra(RESULT_JSON_KEY,jsonArray);
+        context.startActivityForResult(intent,REQUEST_CODE);
+    }
     /** 初始化数据*/
     private void initData() {
         userChannelList = ((ArrayList<ChannelItem>)ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).getUserChannel());
@@ -101,6 +124,13 @@ public class ChannelActivity  extends Activity implements AdapterView.OnItemClic
     private void initView() {
         userGridView = (DragGrid) findViewById(R.id.userGridView);
         otherGridView = (OtherGridView) findViewById(R.id.otherGridView);
+        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveChannel();
+                finish();
+            }
+        });
     }
 
 

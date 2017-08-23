@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         ChannelActivity.startChannelForResult(this,list);
+//         MyChannel.startChannelForResult(this,list,MyChannel.class);
     }
 
     @Override
