@@ -160,13 +160,16 @@ public class ChannelActivity  extends AppCompatActivity implements AdapterView.O
     private void initView() {
         userGridView = (DragGrid) findViewById(R.id.userGridView);
         otherGridView = (OtherGridView) findViewById(R.id.otherGridView);
-        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveChannel();
-                finish();
-            }
-        });
+        View back = findViewById(R.id.back);
+        if(back!=null){
+            back.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveChannel();
+                    finish();
+                }
+            });
+        }
     }
 
 
