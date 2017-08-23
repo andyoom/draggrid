@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,6 +108,41 @@ public class ChannelActivity  extends AppCompatActivity implements AdapterView.O
         intent.putExtra(RESULT_JSON_KEY,jsonArray);
         context.startActivityForResult(intent,REQUEST_CODE);
     }
+
+    //====================================================================
+    public static void startChannel(Fragment context){
+        startChannel(context,ChannelActivity.class);
+    }
+
+    public static void startChannel(Fragment context,Class<? extends Activity> cls){
+        Intent intent=new Intent(context.getContext(), cls);
+        context.startActivity(intent);
+    }
+
+
+    public static void startChannelForResult(Fragment context, String jsonArray){
+        startChannelForResult(context, jsonArray ,ChannelActivity.class);
+    }
+
+
+    public static void startChannelForResult(Fragment context,List<ChannelBean> list){
+        Gson gson =new Gson();
+        String jsonArray=gson.toJson(list);
+        startChannelForResult(context,jsonArray);
+    }
+
+    public static void startChannelForResult(Fragment context,List<ChannelBean> list,Class<? extends Activity> cls){
+        Gson gson =new Gson();
+        String jsonArray=gson.toJson(list);
+        startChannelForResult(context,jsonArray,cls);
+    }
+
+    public static void startChannelForResult(Fragment context, String jsonArray,Class<? extends Activity> cls){
+        Intent intent=new Intent(context.getContext(), cls);
+        intent.putExtra(RESULT_JSON_KEY,jsonArray);
+        context.startActivityForResult(intent,REQUEST_CODE);
+    }
+
     /** 初始化数据*/
     private void initData() {
         userChannelList = ((ArrayList<ChannelItem>)ChannelManage.getManage(AppApplication.getApp().getSQLHelper()).getUserChannel());
